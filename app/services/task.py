@@ -11,7 +11,7 @@ from app.models.schema import VideoConcatMode, VideoParams
 from app.services import llm, material, subtitle, video, voice
 from app.services import state as sm
 from app.utils import utils
-
+from moviepy import  AudioFileClip
 
 def generate_script(task_id, params):
     logger.info("\n\n## generating video script")
@@ -90,6 +90,13 @@ def generate_audio(task_id, params, video_script):
         return None, None, None
 
     audio_duration = math.ceil(voice.get_audio_duration(sub_maker))
+    if(params.video_clip_duration == 9999):
+        bgm_file = video.get_bgm_file(bgm_type=params.bgm_type, bgm_file=params.bgm_file)
+        if bgm_file:
+            audio_file = bgm_file
+            bgm_clip = AudioFileClip(bgm_file)
+            audio_duration =  bgm_clip.duration
+        logger.info(f"\n\n## video_clip_duration == 9999 use bgm file instead audio duration {audio_duration} file {audio_file}")
     return audio_file, audio_duration, sub_maker
 
 

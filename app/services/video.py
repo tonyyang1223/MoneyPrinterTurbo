@@ -129,7 +129,11 @@ def combine_videos(
     logger.info(f"audio duration: {audio_duration} seconds")
     # Required duration of each clip
     req_dur = audio_duration / len(video_paths)
-    req_dur = max_clip_duration
+    if max_clip_duration == 9999:
+        req_dur = audio_duration / len(video_paths)
+    else:
+        if req_dur > max_clip_duration:
+           req_dur =  max_clip_duration
     logger.info(f"maximum clip duration: {req_dur} seconds")
     output_dir = os.path.dirname(combined_video_path)
 
@@ -148,6 +152,9 @@ def combine_videos(
         start_time = 0
 
         while start_time < clip_duration:
+            if max_clip_duration == 9999:
+                subclipped_items.append(SubClippedVideoClip(file_path= video_path, start_time=start_time, end_time=start_time + clip_duration, width=clip_w, height=clip_h))
+                break
             end_time = min(start_time + max_clip_duration, clip_duration)            
             if clip_duration - start_time >= max_clip_duration:
                 subclipped_items.append(SubClippedVideoClip(file_path= video_path, start_time=start_time, end_time=end_time, width=clip_w, height=clip_h))
@@ -359,7 +366,6 @@ def wrap_text(text, max_width, font="Arial", fontsize=60):
     height = len(_wrapped_lines_) * height
     return result, height
 
-
 def generate_video(
     video_path: str,
     audio_path: str,
@@ -367,6 +373,7 @@ def generate_video(
     output_file: str,
     params: VideoParams,
 ):
+     # 等待视频文件准备好
     aspect = VideoAspect(params.video_aspect)
     video_width, video_height = aspect.to_resolution()
 
