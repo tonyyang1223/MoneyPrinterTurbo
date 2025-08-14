@@ -209,11 +209,12 @@ def download_videos(
     search_videos = search_videos_pexels
     if source == "pixabay":
         search_videos = search_videos_pixabay
-
+    if max_clip_duration == 9999:
+        max_clip_duration_t = 30
     for search_term in search_terms:
         video_items = search_videos(
             search_term=search_term,
-            minimum_duration=max_clip_duration,
+            minimum_duration=max_clip_duration_t,
             video_aspect=video_aspect,
         )
         logger.info(f"found {len(video_items)} videos for '{search_term}'")
